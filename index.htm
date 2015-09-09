@@ -3,77 +3,35 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>Seriously.js</title>
-		<!--<script type="text/javascript" src="lib/webgl-debug.js"></script> -->
-		<script type="text/javascript"src="Seriously.js/seriously.js"></script>
-		<script type="text/javascript"src="Seriously.js/transforms/seriously.transform3d.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.accumulator.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.ascii.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.bleach-bypass.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.blend.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.brightness-contrast.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.checkerboard.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.chroma.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.color.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.colorcomplements.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.color-select.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.daltonize.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.dither.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.edge.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.emboss.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.exposure.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.falsecolor.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.freeze.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.highlights-shadows.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.kaleidoscope.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.lumakey.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.fader.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.filmgrain.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.blur.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.hue-saturation.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.hex.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.invert.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.directionblur.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.nightvision.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.noise.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.pixelate.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.polar.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.ripple.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.scanlines.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.sepia.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.sketch.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.throttle.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.tone.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.tvglitch.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.vibrance.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.vignette.js"></script>
-		<script type="text/javascript"src="Seriously.js/effects/seriously.split.js"></script>
-		<style>
+		
+		<style type="text/css">
 
-		body {
-			background-color: black;
-		}
+			body {
+				background-color: black;
+			}
 
-		#video {
-			display: none;
-		}
+			#video {
+				display: none;
+			}
 
-		#canvas {
-			position: fixed;
-			top: 0;
-			right: 0;
-			left: 0;
-			bottom: 0;
-			width: 100%;
-		}
+			#canvas {
+				position: fixed;
+				top: 0;
+				right: 0;
+				left: 0;
+				bottom: 0;
+				width: 100%;
+			}
 
-		#analyser {
-			position: absolute;
-			top:0;
-			left:0;
-			color:white;
-			z-index:2;
-			font-family: Courier;
-		}
+			#analyser {
+				display: none;
+				position: absolute;
+				top:0;
+				left:0;
+				color:white;
+				z-index:2;
+				font-family: Courier;
+			}
 
 		</style>
 
@@ -88,214 +46,12 @@
 
 		<div id="analyser"></div>
 
-		
-
-		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
-
-		<script type="text/javascript">
-
-			!(function(undefined) {
-
-
-				const DEBUG = false,
-					CAPTURE = 'mike';
-
-				var ilj = {};
-
-
-				(function() {
-					// shim the getUserMedia
-					var usersMedias = ['getUserMedia', 'webkitGetUserMedia', 'mozGetUserMedia', 'msGetUserMedia'];
-					var method = _.find(usersMedias, function(itm) { 
-						return itm in navigator;
-					});
-					navigator.getUserMedia = navigator[method];
-				})();
-
-
-
-				ilj.AudioController = function AudioController(capture) {
-
-					this.callbacks = [];
-
-					var context = new (window.AudioContext || window.webkitAudioContext)();
-
-					if(!context) {
-						throw new "Not Supported.";
-						return;
-					}
-
-					var analyser = context.createAnalyser();
-					analyser.fftSize = 32; // sample size
-					var frequencyData = new Uint8Array(analyser.frequencyBinCount);
-
-
-				    var source = capture.tagName ?  
-				    		context.createMediaElementSource(capture) : 
-				    		context.createMediaStreamSource(capture);
-				    	
-					source.connect(analyser);
-				    analyser.connect(context.destination);
-
-				    var boundUpdate = _.bind(update,  this);
-
-				    requestAnimationFrame(boundUpdate);
-
-					function update() {
-						analyser.getByteFrequencyData(frequencyData);
-
-						requestAnimationFrame(boundUpdate);
-
-						_.each(this.callbacks, function(callback) {
-							callback(frequencyData);
-						})
-					}
-
-					this.registerNotifier = function(callback) {
-						this.callbacks.push(callback);
-					}
-
-					this.unregisterNotifier = function(callback) {
-						_.remove(this.callbacks, callback);
-					}
-
-				};
-
-
-				ilj.VideoController = function VideoController(video, canvas) {
-
-					var seriously = new Seriously(),
-						source = seriously.source(video),
-						target = seriously.target(canvas);
-
-
-
-					var effects = {
-						invert : seriously.effect('invert'), 
-						tvglitch : seriously.effect('tvglitch'),
-						kaleidoscope : seriously.effect('kaleidoscope'),
-						hueSaturation : seriously.effect('hue-saturation'),
-						invert : seriously.effect('invert')
-					}
-
-					effects.tvglitch.distortion=0;
-					effects.tvglitch.verticalSync=0;
-					effects.tvglitch.lineSync=0;
-
-					effects.kaleidoscope.segments = 1;
-
-					effects.hueSaturation.saturation = -1;
-					effects.hueSaturation.hue = -1;
-
-
-					// wire it up in sequence. 
-					effects.invert.source = video;
-					effects.hueSaturation.source = effects.invert;
-					effects.tvglitch.source = effects.hueSaturation;
-					effects.kaleidoscope.source = effects.tvglitch;
-					target.source = effects.kaleidoscope;
-
-					seriously.go();
-
-					this.setEffect = function setEffect(effect, prop, val) {
-						effects[effect][prop] = val;
-					}
-					
-				};
-
-
-
-				ilj.Logger = function Logger($el) {
-					this.log = function(data) {
-						var list = _.map(data, function(itm) {
-							var s = "000" + itm;
-							return s.substr(s.length - 3); // pad leading zeros e.g. 001
-						});
-						$el.text(list.join('\t'));
-					}
-				};
-
-
-
-
-
-				(function(ilj, undefined) {
-
-					var audioController;
-					var logger = new ilj.Logger($('#analyser'));
-					var audioElement = $('#audioPlayer')[0]
-
-					var canvas = $('#canvas')[0];
-					var video = $('#video')[0];
-					var videoController = new ilj.VideoController(video, canvas);
-
-
-					video.addEventListener('loadedmetadata', function() {
-					  this.currentTime = 62;
-					}, false);
-
-					video.play();
-
-
-
-					$(window).on('keypress', onKeyPress);
-
-					function onKeyPress(e) {
-						var isNumber = e.which >= 48 && e.which < 59;
-						if(!isNumber) return;
-						videoController.setEffect('kaleidoscope', 'segments', e.which - 48);
-					}
-
-
-					function onStreamSuccess(stream) {
-						debugger;
-						audioController = new ilj.AudioController(stream);
-						audioController.registerNotifier(logger.log);
-
-						audioController.registerNotifier(function(data) {
-							var glitch =  data[13]/1000;
-							glitch = glitch>0.04 ? glitch : 0;
-							videoController.setEffect('tvglitch', 'distortion', glitch );
-						});
-					}
-
-					function onStreamFail() {
-						console.error('Failed to initialize a stream', arguments);
-					}
-
-					if(CAPTURE == 'audio') {
-						// audo element e.g. mp3
-						audioElement.addEventListener('canplay', onStreamSuccess.bind(this, audioElement));
-					}
-					else {
-						// microphone/linein 
-						navigator.getUserMedia( {audio : true},   onStreamSuccess, onStreamFail);
-					}	
-				
-
-				})(ilj);
-
-
-
-				
-
-
-			
-
-
-
-
-
-
-
-
-
-
-			})();
-
-		</script>
-
+	
+
+		<script defer src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script defer src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+		<script defer src="scripts/seriously.min.js.gz"></script>
+		<script defer src="scripts/take_it_lower.js"></script>
 
 
 	</body>
